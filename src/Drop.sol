@@ -12,6 +12,7 @@ contract Drop is Ownable2Step {
     mapping(address => bool) public isClaimed;
     uint256 public claims;
     bool public stopped = true;
+    uint256[3] public amounts = [10_000, 50_000, 250_000];
 
     constructor(
         ICredentialRegistry registry,
@@ -33,11 +34,11 @@ contract Drop is Ownable2Step {
 
         uint256 amount;
         if (totalScore < 10) {
-            amount = 100_000;
+            amount = amounts[0];
         } else if (totalScore < 20) {
-            amount = 500_000;
+            amount = amounts[1];
         } else {
-            amount = 2_500_000;
+            amount = amounts[2];
         }
         amount *= 1 ether;
 
@@ -58,6 +59,12 @@ contract Drop is Ownable2Step {
     }
 
     // ONLY OWNER //
+    function setAmounts(
+        uint256[3] memory amounts_
+    ) public onlyOwner {
+        amounts = amounts_;
+    }
+
     function retrieve() public onlyOwner {
         stopped = true;
         uint256 amount = TOKEN.balanceOf(address(this));

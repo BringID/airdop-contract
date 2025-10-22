@@ -11,17 +11,16 @@ contract DeployTopupRun is Script {
         // Assume registry is already deployed - get from environment or use hardcoded address
         address registryAddress = vm.envOr("CREDENTIAL_REGISTRY_ADDRESS", address(0));
         require(registryAddress != address(0), "CREDENTIAL_REGISTRY_ADDRESS must be set");
+
         address token = vm.envOr("TOKEN", address(0));
         require(token != address(0), "TOKEN must be set");
 
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-
-        vm.startBroadcast(deployerPrivateKey);
+        vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
             Drop drop = new Drop(
                 ICredentialRegistry(registryAddress),
                 IERC20(token)
             );
-            IERC20(token).transfer(address(drop), 1_000_000_000 * 1 ether);
+            IERC20(token).transfer(address(drop), 50_000_000 * 1 ether);
             drop.run();
         vm.stopBroadcast();
 
