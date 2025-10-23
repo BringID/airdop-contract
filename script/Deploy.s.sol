@@ -5,6 +5,34 @@ import {Drop} from "../src/Drop.sol";
 import {ICredentialRegistry} from "bringid/ICredentialRegistry.sol";
 import {IERC20} from "openzeppelin/token/ERC20/IERC20.sol";
 import {Script, console} from "forge-std/Script.sol";
+import "../src/Faucet.sol";
+import {EthDrop} from "../src/EthDrop.sol";
+
+contract DeployFaucet is Script {
+    function run() public {
+        vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
+            EthFaucet F = new EthFaucet();
+            F.transferOwnership(0xBB3D568d557857Ca77772476Ad6edEE88A9BB430);
+        vm.stopBroadcast();
+
+        console.log("EthFaucet:", address(F));
+    }
+}
+
+contract DeployFaucetMainnet is Script {
+    function run() public {
+        address CR = vm.envOr("CREDENTIAL_REGISTRY_ADDRESS", address(0));
+        require(CR != address(0), "CREDENTIAL_REGISTRY_ADDRESS should be provided");
+
+        vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
+            EthDrop ED = new EthDrop(ICredentialRegistry(CR));
+
+            ED.transferOwnership(0xBB3D568d557857Ca77772476Ad6edEE88A9BB430);
+        vm.stopBroadcast();
+
+        console.log("EthFaucet:", address(ED));
+    }
+}
 
 contract DeployTopupRun is Script {
     function run() public {
